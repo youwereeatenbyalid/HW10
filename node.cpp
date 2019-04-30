@@ -1,41 +1,45 @@
 #include <stdlib.h>
 #include <stack>
 template <typename data>
+
 class Node{
 public:
-    std::pair <int , std::stack<Node>> max(std::pair <int , std::stack<Node>> a, std::pair <int , std::stack<Node>> b){
-        return(a.first >= b.first)? a:b;
-    } 
-
-    std::pair <int , std::stack<Node>> height(Node<data> mynode){
-        if(mynode == NULL) 
-            return (0,new std::stack<Node>);
-        std::pair <int , std::stack<Node>> value = max(height(mynode.left),height(mynode.right));
-        value.first+=1;
-        value.second.push(mynode);
-        return value;
-    }
-    std::pair <int , std::stack<Node>> diameter(Node<data>mynode){
-        if(mynode == NULL)
-            return (0,new std::stack<Node>);
-        std::pair <int , std::stack<Node>> leftheight = height(mynode.left);
-        std::pair <int , std::stack<Node>> rightheight = height(mynode.right);
-        std::pair <int , std::stack<Node>> leftdiameter = diameter(mynode.left);
-        std::pair <int , std::stack<Node>> rightdiameter = diameter(mynode.right);
-        
-        if (max(leftdiameter,rightdiameter).first > leftheight.first+rightheight.first+1){
-            return max(leftdiameter,rightdiameter);
-        }else{
-            leftheight.push(mynode);
-            for(int i = 0; i < rightheight.first;i++){
-                leftheight.push(rightheight.pop());
-            }
-            return leftheight;
-        }
+    
+    
+    Node(data newdata, Node* myleft = NULL, Node* myright = NULL):nodeData(newdata),left(myleft),right(myright){}
+    //getters and setters
+    void setLeft(Node* myleft){left = myleft;}
+    void setRight(Node* myright){right = myright;}
+    Node* getLeft(){return left;}
+    Node* getRight(){return right;}
+    data getData(){
+        return nodeData;
     }
     
+    //definition of a "node pair," an integer and a stack of nodes
+    typedef std::stack<Node*> path;
+    //compares a pair and returns whichever has the greatest integer value.
+    path max(path a, path b){
+        return(a.size() >= b.size())? a:b;
+    }
+    //return the maximum height.*
+    path height(){
+        path leftheight;
+        path rightheight;
+        if(left!=NULL){leftheight = left->height();}
+        if(right!=NULL){rightheight = right->height();}
+        path value = max(leftheight,rightheight);
+        //increments its count by one, adds the current node to the stack.
+        value.push(this);
+        //returns the pair.
+        return value;
+    
+    }
+
+    
 private:
-    Node* left;
-    Node* right;
     data nodeData;
+    Node* left = NULL;
+    Node* right = NULL;
+
 };
